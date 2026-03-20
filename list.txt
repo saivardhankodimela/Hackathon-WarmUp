@@ -1,0 +1,2 @@
+   SERVICE           REGION       URL                                                        LAST DEPLOYED BY              LAST DEPLOYED AT
+X  civic-ai-backend  us-central1  https://civic-ai-backend-804563160157.us-central1.run.app  saivardhankodimela@gmail.com  2026-03-20T07:43:48.049691Z

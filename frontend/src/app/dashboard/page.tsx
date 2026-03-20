@@ -16,12 +16,13 @@ interface Complaint {
 export default function Dashboard() {
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<str | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchComplaints = async () => {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
       try {
-        const response = await fetch("http://localhost:8080/complaints");
+        const response = await fetch(`${apiUrl}/complaints`);
         if (!response.ok) {
           throw new Error("Failed to fetch complaints");
         }

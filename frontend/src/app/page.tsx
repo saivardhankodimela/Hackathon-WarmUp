@@ -34,8 +34,10 @@ export default function Home() {
       formData.append("image", file);
     }
 
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+
     try {
-      const response = await fetch("http://localhost:8080/complaints", {
+      const response = await fetch(`${apiUrl}/complaints`, {
         method: "POST",
         body: formData,
       });
