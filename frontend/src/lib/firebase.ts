@@ -15,4 +15,9 @@ const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
+// Force the account selection prompt for smoother user choice
+googleProvider.setCustomParameters({ 
+  prompt: 'select_account' 
+});
+
 export { auth, googleProvider };

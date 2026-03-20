@@ -22,6 +22,7 @@ interface Complaint {
 export default function Dashboard() {
   const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filter, setFilter] = useState<"all" | "pending" | "resolved" | "high">("all");
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,6 +50,26 @@ export default function Dashboard() {
   const totalReports = complaints.length;
   const pendingCount = complaints.filter((c) => c.status === "pending").length;
   const resolvedCount = complaints.filter((c) => c.status === "resolved").length;
+
+  const filteredComplaints = complaints.filter((c) => {
+    if (filter === "all") return true;
+    if (filter === "pending") return c.status === "pending";
+    if (filter === "resolved") return c.status === "resolved";
+    if (filter === "high") return c.severity === "high";
+    return true;
+  });
+
+  const SkeletonCard = () => (
+    <div className="bg-slate-800/20 rounded-xl p-6 border border-white/5 animate-pulse flex gap-6">
+      <div className="w-40 h-28 bg-slate-800/60 rounded-lg shrink-0"></div>
+      <div className="flex-1 space-y-4">
+        <div className="h-3 bg-slate-800/60 rounded w-1/4"></div>
+        <div className="h-5 bg-slate-800/60 rounded w-3/4"></div>
+        <div className="h-3 bg-slate-800/60 rounded w-full"></div>
+        <div className="h-3 bg-slate-800/60 rounded w-5/6"></div>
+      </div>
+    </div>
+  );
 
   return (
     <>
@@ -79,7 +100,12 @@ export default function Dashboard() {
         <div className="flex items-center flex-1">
           <div className="relative w-full max-w-md group">
             <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyan-400 transition-colors">search</span>
-            <input className="w-full bg-slate-800/60 border-none rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-cyan-500/50 transition-all" placeholder="Search civic nodes..." type="text"/>
+            <input 
+              aria-label="Search complaints"
+              className="w-full bg-slate-800/60 border-none rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder:text-slate-500 focus:ring-2 focus:ring-cyan-500/50 transition-all" 
+              placeholder="Search civic nodes..." 
+              type="text"
+            />
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -140,19 +166,38 @@ export default function Dashboard() {
 
         {/* Live Complaint Feed */}
         <section>
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col sm:flex-row items-baseline sm:items-center justify-between gap-4 mb-8">
             <h2 className="text-2xl font-bold text-white">Live Complaint Feed</h2>
+            
+            {/* Filter Tabs */}
+            <div className="flex bg-slate-800/60 p-1 rounded-lg border border-white/5 text-xs font-bold" role="tablist" aria-label="Filter complaints">
+              {(["all", "pending", "resolved", "high"] as const).map((tab) => (
+                <button
+                  key={tab}
+                  role="tab"
+                  aria-selected={filter === tab}
+                  onClick={() => setFilter(tab)}
+                  className={`px-4 py-2 rounded-md transition-all capitalize ${filter === tab ? 'bg-cyan-500 text-slate-900 shadow-lg shadow-cyan-500/20' : 'text-slate-400 hover:text-white'}`}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
           </div>
 
           {loading ? (
-            <p className="text-slate-400">Loading complaints...</p>
+            <div className="space-y-4">
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
+            </div>
           ) : error ? (
-            <p className="text-error">{error}</p>
-          ) : complaints.length === 0 ? (
-            <p className="text-slate-400">No complaints reported yet.</p>
+            <div role="alert" className="text-rose-400 p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl text-sm font-semibold">{error}</div>
+          ) : filteredComplaints.length === 0 ? (
+            <p className="text-slate-400 text-sm">No complaints found matching this criteria.</p>
           ) : (
-            <div className="grid grid-cols-1 gap-4">
-              {complaints.map((complaint) => (
+            <div className="grid grid-cols-1 gap-4" role="feed" aria-busy={loading}>
+              {filteredComplaints.map((complaint) => (
                 <div key={complaint.id} className="glass-card rounded-xl p-6 hover:shadow-2xl hover:shadow-cyan-500/5 transition-all duration-500 group">
                   <div className="flex items-start gap-6">
                     {complaint.image_url && (

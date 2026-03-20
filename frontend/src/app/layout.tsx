@@ -14,8 +14,14 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Civic AI - Smart Complaints Management",
-  description: "Identify and resolve infrastructure issues using AI analytics.",
+  title: "Civic AI - Smart Civic Complaints Management",
+  description: "Report infrastructure issues instantly with AI-powered analysis. Civic AI helps communities track and resolve potholes, broken lights, sanitation, and more.",
+  keywords: "civic complaints, pothole reporting, infrastructure issues, AI civic technology, community reporting",
+  openGraph: {
+    title: "Civic AI - Smart Cities Intelligence Platform",
+    description: "AI-powered civic issue reporting with real-time tracking and Gemini analytics.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -32,6 +38,13 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-slate-950 text-slate-100 antialiased font-manrope">
+        {/* Skip to main content - accessibility */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-cyan-500 focus:text-white focus:rounded-lg focus:font-bold focus:shadow-lg"
+        >
+          Skip to main content
+        </a>
         <AuthProvider>
           {children}
         </AuthProvider>

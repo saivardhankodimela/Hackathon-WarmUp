@@ -14,8 +14,11 @@ desktop.ini
 **/*.py[cod]
 **/venv/
 **/.env
+**/.env*
+**/.env.production
 **/.env.local
 **/.pytest_cache/
+.env.production
 
 # Node / Frontend
 **/node_modules/

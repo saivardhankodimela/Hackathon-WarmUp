@@ -115,7 +115,7 @@ export default function Home() {
       </nav>
       <LoginModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
-      <main className="pt-24">
+      <main id="main-content" className="pt-24">
         {/* Hero Section */}
         <section className="relative min-h-[921px] flex items-center overflow-hidden px-6 lg:px-12">
           <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px]"></div>
@@ -184,28 +184,41 @@ export default function Home() {
                 <span className="material-symbols-outlined text-white/5 text-[120px]">biotech</span>
               </div>
               <div className="relative z-10 max-w-2xl">
-                <label className="block text-secondary text-sm font-bold mb-4 tracking-widest uppercase">Quick Narrative Submission</label>
+                <label htmlFor="complaint-description" className="block text-secondary text-sm font-bold mb-4 tracking-widest uppercase">Quick Narrative Submission</label>
                 
                 <div className="relative space-y-4">
                   <textarea 
+                    id="complaint-description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     className="w-full bg-slate-800/60 border-none rounded-lg p-6 text-white placeholder:text-slate-500 focus:ring-2 focus:ring-primary transition-all resize-none" 
                     placeholder="E.g., Street lamp out near the central park north entrance..." 
                     rows={4}
+                    maxLength={1000}
+                    aria-label="Describe the civic issue you want to report"
+                    aria-describedby="char-count"
                   ></textarea>
+                  <p id="char-count" className="text-xs text-slate-500 text-right">{description.length}/1000</p>
 
                   <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
                     <div className="flex items-center gap-4">
                       <label className="cursor-pointer bg-slate-700/60 hover:bg-slate-700 p-3 rounded-lg flex items-center gap-2 text-white transition-colors">
-                        <span className="material-symbols-outlined text-cyan-400">add_a_photo</span>
+                        <span className="material-symbols-outlined text-cyan-400" aria-hidden="true">add_a_photo</span>
                         <span className="text-sm">{file ? "Change Image" : "Attach Image"}</span>
-                        <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+                        <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" aria-label="Attach an image of the civic issue" />
                       </label>
                       
-                      {previewUrl && (
-                        <div className="relative h-12 w-16 rounded border border-cyan-400/30 overflow-hidden">
-                          <img src={previewUrl} alt="Preview" className="h-full w-full object-cover" />
+                      {file && (
+                        <div className="flex items-center gap-2">
+                          {previewUrl && (
+                            <div className="relative h-12 w-16 rounded border border-cyan-400/30 overflow-hidden shrink-0">
+                              <img src={previewUrl} alt={`Preview of ${file.name}`} className="h-full w-full object-cover" />
+                            </div>
+                          )}
+                          <div className="text-xs text-slate-400">
+                            <p className="font-semibold text-slate-300 truncate max-w-[150px]">{file.name}</p>
+                            <p>{(file.size / 1024).toFixed(1)} KB</p>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -213,14 +226,25 @@ export default function Home() {
                     <button 
                       type="submit" 
                       disabled={loading}
-                      className="bg-primary text-on-primary font-bold px-8 py-3 rounded-lg hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+                      aria-busy={loading}
+                      aria-label="Submit civic issue report"
+                      className="bg-primary text-on-primary font-bold px-8 py-3 rounded-lg hover:scale-105 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      {loading ? "Processing..." : "Process Report"}
+                      {loading ? (
+                        <><span className="animate-spin material-symbols-outlined text-sm" aria-hidden="true">progress_activity</span> Processing...</>
+                      ) : "Process Report"}
                     </button>
                   </div>
 
                   {message && (
-                    <div className={`mt-4 p-4 rounded-lg text-sm font-medium ${message.type === "success" ? "bg-tertiary/10 text-tertiary border border-tertiary/20" : "bg-error/10 text-error border border-error/20"}`}>
+                    <div 
+                      role="alert" 
+                      aria-live="polite"
+                      className={`mt-4 p-4 rounded-lg text-sm font-medium flex items-center gap-2 ${message.type === "success" ? "bg-tertiary/10 text-tertiary border border-tertiary/20" : "bg-error/10 text-error border border-error/20"}`}
+                    >
+                      <span className="material-symbols-outlined text-base" aria-hidden="true">
+                        {message.type === "success" ? "check_circle" : "error"}
+                      </span>
                       {message.text}
                     </div>
                   )}
