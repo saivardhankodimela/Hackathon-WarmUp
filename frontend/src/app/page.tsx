@@ -1,8 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "@/components/AuthProvider";
+import Link from "next/link";
+import LoginModal from "@/components/LoginModal";
 
 export default function Home() {
+  const { user, loginWithGoogle, logout } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -24,12 +29,20 @@ export default function Home() {
       return;
     }
 
+    if (!user) {
+      setIsModalOpen(true);
+      return;
+    }
+
     setLoading(true);
     setMessage(null);
 
     const formData = new FormData();
     formData.append("description", description);
     formData.append("location", "Location pending"); // Placeholder or geolocation
+    if (user) {
+      formData.append("user_id", user.uid);
+    }
     if (file) {
       formData.append("image", file);
     }
@@ -37,9 +50,13 @@ export default function Home() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
     try {
-      const response = await fetch(`${apiUrl}/complaints`, {
+      // Get Firebase Auth ID Token for backend verification
+      const token = user ? await user.getIdToken() : null;
+      
+      const response = await fetch(`${apiUrl}/complaints/`, {
         method: "POST",
         body: formData,
+        headers: token ? { "Authorization": `Bearer ${token}` } : {},
       });
 
       if (response.ok) {
@@ -67,14 +84,26 @@ export default function Home() {
             CIVIC.AI
           </div>
           <div className="hidden md:flex items-center gap-8 font-manrope font-bold tracking-tight">
-            <a className="text-cyan-400 border-b-2 border-cyan-400 pb-1" href="#"> Platform </a>
-            <a className="text-slate-300 hover:text-white transition-colors" href="/dashboard"> Transparency </a>
-            <a className="text-slate-300 hover:text-white transition-colors" href="#"> Impact </a>
+            <Link className="text-cyan-400 border-b-2 border-cyan-400 pb-1" href="#"> Platform </Link>
+            <Link className="text-slate-300 hover:text-white transition-colors" href="/dashboard"> Transparency </Link>
+            <Link className="text-slate-300 hover:text-white transition-colors" href="#"> Impact </Link>
           </div>
           <div className="flex items-center gap-4">
-            <button className="px-5 py-2 text-sm font-semibold text-slate-300 hover:text-white transition-all opacity-80 hover:opacity-100">
-              Sign In
-            </button>
+            {user ? (
+              <div className="flex items-center gap-4">
+                {user.photoURL && (
+                  <img src={user.photoURL} alt="Avatar" className="w-8 h-8 rounded-full border border-cyan-400" />
+                )}
+                <span className="text-slate-300 text-sm font-semibold">{user.displayName}</span>
+                <button onClick={logout} className="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white transition-all">
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <button onClick={() => setIsModalOpen(true)} className="px-5 py-2 text-sm font-semibold text-slate-300 hover:text-white transition-all opacity-80 hover:opacity-100">
+                Sign In
+              </button>
+            )}
             <a
               href="#submission"
               className="px-6 py-2.5 bg-primary text-on-primary font-bold rounded-lg shadow-[0_0_12px_rgba(0,218,243,0.3)] hover:scale-95 active:scale-90 transition-transform cursor-pointer"
@@ -84,6 +113,7 @@ export default function Home() {
           </div>
         </div>
       </nav>
+      <LoginModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
       <main className="pt-24">
         {/* Hero Section */}

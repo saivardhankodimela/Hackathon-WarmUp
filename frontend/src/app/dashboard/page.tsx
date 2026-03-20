@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useAuth } from "@/components/AuthProvider";
+import Link from "next/link";
+import LoginModal from "@/components/LoginModal";
+import MapView from "@/components/MapView";
 
 interface Complaint {
   id: string;
@@ -11,9 +15,13 @@ interface Complaint {
   created_at: string;
   image_url?: string;
   location?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export default function Dashboard() {
+  const { user } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,14 +63,14 @@ export default function Dashboard() {
           </p>
         </div>
         <nav className="flex-1 px-4 space-y-2 mt-4">
-          <a className="flex items-center gap-3 px-4 py-3 text-cyan-400 bg-cyan-500/10 rounded-lg border-r-2 border-cyan-400 font-manrope text-sm font-semibold tracking-tight transition-all duration-300" href="#">
+          <Link className="flex items-center gap-3 px-4 py-3 text-cyan-400 bg-cyan-500/10 rounded-lg border-r-2 border-cyan-400 font-manrope text-sm font-semibold tracking-tight transition-all duration-300" href="#">
             <span className="material-symbols-outlined">dashboard</span>
             <span>Dashboard</span>
-          </a>
-          <a className="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all duration-300 font-manrope text-sm font-semibold tracking-tight" href="/">
+          </Link>
+          <Link className="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all duration-300 font-manrope text-sm font-semibold tracking-tight" href="/">
             <span className="material-symbols-outlined">assessment</span>
             <span>Home</span>
-          </a>
+          </Link>
         </nav>
       </aside>
 
@@ -75,12 +83,30 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <div className="text-right">
-            <p className="text-xs font-bold text-white">Alex Rivera</p>
-            <p className="text-[10px] text-cyan-400 font-semibold tracking-tighter">ADMINISTRATOR</p>
-          </div>
+          {user ? (
+            <>
+              {user.photoURL && (
+                <img src={user.photoURL} alt="Avatar" className="w-8 h-8 rounded-full border border-cyan-400" />
+              )}
+              <div className="text-right">
+                <p className="text-xs font-bold text-white">{user.displayName || "User"}</p>
+                <p className="text-[10px] text-cyan-400 font-semibold tracking-tighter">CONTRIBUTOR</p>
+              </div>
+            </>
+          ) : (
+            <div className="text-right flex items-center gap-2">
+              <div>
+                <p className="text-xs font-bold text-white">Guest Node</p>
+                <p className="text-[10px] text-slate-400 font-semibold tracking-tighter">VIEWER</p>
+              </div>
+              <button onClick={() => setIsModalOpen(true)} className="px-3 py-1 bg-cyan-500/20 hover:bg-cyan-500/40 text-cyan-400 rounded-md text-xs font-bold border border-cyan-400/20 hover:scale-95 transition-all cursor-pointer">
+                Login
+              </button>
+            </div>
+          )}
         </div>
       </header>
+      <LoginModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
       {/* Main Content */}
       <main className="ml-64 p-8 min-h-screen">
@@ -143,13 +169,19 @@ export default function Dashboard() {
                             <span className="text-slate-400 text-xs font-medium">{new Date(complaint.created_at).toLocaleString()}</span>
                           </div>
                           <h4 className="text-xl font-bold mb-2 text-white">{complaint.description.substring(0, 50)}...</h4>
-                          <p className="text-slate-400 text-sm max-w-2xl leading-relaxed">{complaint.description}</p>
+                          <p className="text-slate-400 text-sm max-w-2xl leading-relaxed mb-4">{complaint.description}</p>
+                          
+                          {complaint.latitude && complaint.longitude && complaint.latitude !== 0 && (
+                            <div className="w-full max-w-lg h-48 rounded-lg overflow-hidden border border-white/5 shadow-inner mt-4">
+                              <MapView latitude={complaint.latitude} longitude={complaint.longitude} zoom={15} />
+                            </div>
+                          )}
                         </div>
                         <div className="flex flex-col items-end gap-2">
-                          <span className={`px-3 py-1 text-xs font-black rounded-full border ${complaint.severity === 'high' ? 'bg-error/10 text-error border-error/20' : complaint.severity === 'medium' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-green-500/10 text-green-500 border-green-500/20'}`}>
+                          <span className={`px-3 py-1 text-xs font-black rounded-full border ${complaint.severity === 'high' ? 'bg-rose-500/10 text-rose-500 border-rose-500/20' : complaint.severity === 'medium' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' : 'bg-slate-500/10 text-slate-300 border-slate-500/20'}`}>
                             {complaint.severity ? complaint.severity.toUpperCase() : "NORMAL"}
                           </span>
-                          <span className="px-3 py-1 bg-cyan-500/10 text-cyan-400 text-[10px] font-bold rounded uppercase tracking-tighter">
+                          <span className="px-3 py-1 bg-slate-800/80 border border-white/5 text-slate-300 text-[10px] font-bold rounded uppercase tracking-tighter">
                             Status: {complaint.status}
                           </span>
                         </div>

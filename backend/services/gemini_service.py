@@ -38,8 +38,10 @@ class GeminiService:
             "Identify the category of the issue (e.g., road_damage, sanitation, water, lighting, general). "
             "Assess the severity level (low, medium, high). "
             "Extract a concise description summary and verify if the request is highly accurate/actionable. "
+            "Also extract any address, street name, or landmark mentioned in the narrative text into location_extracted. "
+            "Estimate the 'latitude' and 'longitude' based on the location extracted, or use default city coordinates (e.g., 40.7128, -74.0060) if vague. "
             "IMPORTANT: If the input or image is completely unrelated to civic infrastructure, safety, or community reports (e.g., a random selfie, food, or spam), "
-            "classify the category as 'general', set severity to 'low', and verify as 'false'."
+            "classify the category as 'general', set severity to 'low', verify as 'false', and provide 0.0 for latitude and longitude."
         )
         contents.append(prompt)
 
@@ -68,7 +70,10 @@ class GeminiService:
                 category="general",
                 severity="medium",
                 description_summary=f"Analysis placeholder (Offline support: {text_input[:50]})",
-                verified=True
+                verified=True,
+                location_extracted=None,
+                latitude=0.0,
+                longitude=0.0
             )
 
 gemini_service = GeminiService()

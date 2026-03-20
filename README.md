@@ -4,6 +4,15 @@ A modern, full-stack application leveraging Gemini AI for multimodal civic issue
 
 ---
 
+## ✨ Core Features (What You Can Do Setup)
+
+-   **🔑 Secure Authentication**: Sign in with **Google** to securely tie reported civic complaints to your absolute user profile coordinates securely and keep track of your dashboard layouts.
+-   **🖼️ Multimodal AI Reporting**: Submit **Text Narrative** or upload a **Photo** of infrastructure damage (e.g., potholes, sanitation leaks) absolute transparently.
+-   **🤖 Automated AI Analytics**: Let **Gemini 2.5 Flash** automatically categorize the complaint (Roads, Lighting, Sanitation) and assess severity absolute dynamically for accurate city oversight.
+-   **📊 Real-time Dashboard Intelligence**: Maintain a live feed tracker layout position on top-tier Glassmorphism feeds with AI-verified badges and verification timelines natively!
+
+---
+
 ## 📁 Project Structure
 
 This is a monorepo consisting of:
