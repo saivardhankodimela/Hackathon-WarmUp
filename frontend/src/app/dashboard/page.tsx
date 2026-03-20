@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import Link from "next/link";
+import Image from "next/image";
 import LoginModal from "@/components/LoginModal";
 import MapView from "@/components/MapView";
 
@@ -112,7 +113,13 @@ export default function Dashboard() {
           {user ? (
             <>
               {user.photoURL && (
-                <img src={user.photoURL} alt="Avatar" className="w-8 h-8 rounded-full border border-cyan-400" />
+                <Image 
+                  src={user.photoURL} 
+                  alt="Avatar" 
+                  width={32} 
+                  height={32} 
+                  className="rounded-full border border-cyan-400" 
+                />
               )}
               <div className="text-right">
                 <p className="text-xs font-bold text-white">{user.displayName || "User"}</p>
@@ -202,7 +209,13 @@ export default function Dashboard() {
                   <div className="flex items-start gap-6">
                     {complaint.image_url && (
                       <div className="relative w-40 h-28 rounded-lg overflow-hidden shrink-0 border border-white/10">
-                        <img className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src={complaint.image_url} alt="Civic Issue" />
+                        <Image 
+                          className="object-cover transition-transform duration-700 group-hover:scale-110" 
+                          src={complaint.image_url} 
+                          alt="Civic Issue" 
+                          fill
+                          sizes="(max-width: 160px) 100vw, 160px"
+                        />
                       </div>
                     )}
                     <div className="flex-1">

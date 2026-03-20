@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import Link from "next/link";
+import Image from "next/image";
 import LoginModal from "@/components/LoginModal";
 
 export default function Home() {
@@ -92,7 +93,13 @@ export default function Home() {
             {user ? (
               <div className="flex items-center gap-4">
                 {user.photoURL && (
-                  <img src={user.photoURL} alt="Avatar" className="w-8 h-8 rounded-full border border-cyan-400" />
+                  <Image 
+                    src={user.photoURL} 
+                    alt="Avatar" 
+                    width={32} 
+                    height={32} 
+                    className="rounded-full border border-cyan-400" 
+                  />
                 )}
                 <span className="text-slate-300 text-sm font-semibold">{user.displayName}</span>
                 <button onClick={logout} className="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-white transition-all">
