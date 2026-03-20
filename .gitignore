@@ -19,6 +19,8 @@ desktop.ini
 **/.env.local
 **/.pytest_cache/
 .env.production
+frontend\.env.production
+frontend\.env.local
 
 # Node / Frontend
 **/node_modules/
