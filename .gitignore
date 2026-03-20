@@ -36,3 +36,6 @@ yarn-error.log*
 # Workspace artifacts (Stitch outputs)
 dashboard_stitch.html
 landing_stitch.html
+url.txt
+list.txt
+build_log*.txt

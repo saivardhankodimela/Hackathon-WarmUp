@@ -2,7 +2,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 from google.cloud.firestore_v1.base_query import FieldFilter
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 import os
 from core.config import settings
@@ -17,7 +17,10 @@ try:
         firebase_admin.initialize_app()
     db = firestore.client()
 except Exception as e:
-    print(f"\n⚠️ WARNING: Firebase Admin not connected ({e}). Running in MEMORY mode for quick testing.\n")
+    if settings.APP_ENV == "production":
+        # Crashing fast in production is safer than silent fallback
+        raise RuntimeError(f"CRITICAL: Firebase Admin initialization failed: {e}")
+    print(f"\n⚠️ WARNING: Firebase Admin not connected ({e}). Running in MEMORY mode for local testing.\n")
 
 class FirestoreRepository:
     def __init__(self, collection_name: str = "complaints"):
@@ -30,7 +33,7 @@ class FirestoreRepository:
     def create_complaint(self, complaint_data: dict) -> dict:
         doc_id = str(uuid.uuid4())
         complaint_data["id"] = doc_id
-        complaint_data["created_at"] = datetime.utcnow()
+        complaint_data["created_at"] = datetime.now(timezone.utc)
         complaint_data["status"] = complaint_data.get("status", "pending")
         
         if self.collection:
